@@ -23,7 +23,8 @@ def halfway(type, loan_amount, apr, duration, monthly_interest)
   The loan amount is for $#{loan_amount}.
   The APR is #{apr} %.
   The total loan duration is #{duration} months.
-  The total monthly interest is #{monthly_interest}
+  The total monthly interest is #{monthly_interest} points.
+  ----------------------------------------------
   MSG
 end
 
@@ -97,9 +98,9 @@ loop do
   duration = nil
   loop do
     prompt(MESSAGES['duration'])
-    duration = gets.chomp.to_i
-    if duration > 0
-      duration *= 12
+    duration = gets.chomp
+    if duration.to_i > 0 && !(duration.include? '.')
+      duration = duration.to_i * 12
       prompt("Your total loan duration is #{duration} months.")
       break
     else
@@ -111,8 +112,8 @@ loop do
 
   halfway(type, loan_amount, apr, duration, monthly_interest)
 
-  puts "Your monthly payment is $
-    #{monthly(loan_amount, monthly_interest, duration).round(2)}!"
+  puts "Your monthly payment is:
+    $#{monthly(loan_amount, monthly_interest, duration).round(2)}!"
 
   puts "Would you like to make another calculation? (Enter y to go again)"
   answer = gets.chomp
