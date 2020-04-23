@@ -9,16 +9,6 @@ def prompt(message)
   puts("=> #{message}")
 end
 
-def confirmation(arg)
-  if arg == 'y'
-    puts "Excellent! Let's continue"
-  elsif arg == 'n'
-    puts "No? Hmmm... Let's try again"
-  else
-    puts "I don't recognize that input, try 'y' or 'n'."
-  end
-end
-
 def loan_type(type)
   if type == 1
     'home'
@@ -39,8 +29,8 @@ end
 
 def monthly(loan_amount, monthly_interest, duration)
   if monthly_interest > 0
-  loan_amount *
-    (monthly_interest / (1 - (1 + monthly_interest)**(-1 * duration)))
+    loan_amount *
+      (monthly_interest / (1 - (1 + monthly_interest)**(-1 * duration)))
   else
     loan_amount / duration
   end
@@ -121,8 +111,9 @@ loop do
 
   halfway(type, loan_amount, apr, duration, monthly_interest)
 
-  puts "Your monthly payment is $#{monthly(loan_amount, monthly_interest, duration).round(2)}!"
-  
+  puts "Your monthly payment is $
+    #{monthly(loan_amount, monthly_interest, duration).round(2)}!"
+
   puts "Would you like to make another calculation? (Enter y to go again)"
   answer = gets.chomp
   break unless answer.downcase == 'y'
