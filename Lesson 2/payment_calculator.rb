@@ -1,5 +1,12 @@
+require "yaml"
+MESSAGES = YAML.load_file('payment_calculator_messages.yml')
+
 def clear
   print "\e[2J\e[f"
+end
+
+def prompt(message)
+  puts("=> #{message}")
 end
 
 def confirmation(arg)
@@ -39,13 +46,13 @@ def monthly(loan_amount, monthly_interest, duration)
   end
 end
 
-puts "To enter the calculator, please enter your name:"
+prompt(MESSAGES['begin'])
 
 user_name = nil
 loop do
   user_name = gets.chomp
   if user_name.empty?
-    puts "Please enter a valid name"
+    prompt(MESSAGES['invalid_name'])
   else
     break
   end
@@ -63,50 +70,50 @@ loop do
   loop do
     type = gets.chomp.to_i
     if type == 1
-      puts "Congratulations! What an exciting time for you."
+      prompt(MESSAGES['type_house'])
       break
     elsif type == 2
-      puts "Vroom vroom! Let's go for a drive!"
+      prompt(MESSAGES['type_car'])
       break
     else
-      puts "Please enter 1 or 2 to proceed."
+      prompt(MESSAGES['type_invalid'])
     end
   end
 
   loan_amount = nil
   loop do
-    puts "How much do you plan on borrowing (Integers only! e.g. 20000, 360000)"
+    prompt(MESSAGES['loan_amount'])
     loan_amount = gets.chomp.to_i
     if loan_amount > 0
-      puts "You've entered $#{loan_amount}."
+      prompt("You've entered $#{loan_amount}.")
       break
     else
-      puts "Please enter a valid loan amount."
+      prompt(MESSAGES['amount_invalid'])
     end
   end
 
   apr = nil
   loop do
-    puts "What is your APR? (Floats and Integers only! (e.g. 3.5, 10, etc.)"
+    prompt(MESSAGES['apr_amount'])
     apr = gets.chomp.to_f
-    if apr >= 0
-      puts "You've entered #{apr} %."
+    if apr >= 0 && apr <= 100
+      prompt("You've entered #{apr} %.")
       break
     else
-      puts "Your APR must be greater than 0"
+      prompt(MESSAGES['apr_invalid'])
     end
   end
 
   duration = nil
   loop do
-    puts "What is the duration of the loan in years? (e.g. 12, 5, 1, etc.)"
+    prompt(MESSAGES['duration'])
     duration = gets.chomp.to_i
     if duration > 0
       duration *= 12
-      puts "Your total loan duration is #{duration} months."
+      prompt("Your total loan duration is #{duration} months.")
       break
     else
-      puts "You must enter a valid loan duration."
+      prompt(MESSAGES['duration_invalid'])
     end
   end
 
