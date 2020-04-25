@@ -9,6 +9,61 @@ def prompt(message)
   puts("=> #{message}")
 end
 
+def retrieve_input(input_type)
+  prompt(MESSAGES[input_type])
+  input = nil
+  loop do
+    input = gets.chomp
+    break if valid_input?(input, input_type)
+    prompt(MESSAGES["#{input_type}_invalid"])
+  end
+  prompt("#{input_prompt(input, input_type)}")
+  input.to_f
+end
+
+def input_prompt(input, input_type)
+  case input_type
+  when "loan"
+    prompt("You've entered $#{input}.")
+  when "apr"
+    prompt("You've entered #{input}%.")
+  when "duration"
+    prompt("You've entered #{input} years.")
+  end
+end
+
+def valid_input?(input, input_type)
+  case input_type
+  when "loan"
+    integer?(input) && number?(input)
+  when "apr"
+    apr_valid?(input)
+  when "duration"
+    number?(input) && duration_valid?(input)
+    input.to_i * 12
+  end
+end
+
+def integer?(input)
+  input.to_i.to_s == input
+end
+
+def float?(input)
+  input.to_f.to_s == input
+end
+
+def apr_valid?(input)
+  input.to_i >= 0 && input.to_i <= 100
+end
+
+def number?(input)
+  input.to_f > 0
+end
+
+def duration_valid?(input)
+  !(input.include? '.')
+end
+
 def loan_type(type)
   if type == 1
     'home'
@@ -22,7 +77,7 @@ def halfway(type, loan_amount, apr, duration, monthly_interest)
   It looks like we'll be getting the monthly payment for a #{loan_type(type)} loan with the following details:
   The loan amount is for $#{loan_amount}.
   The APR is #{apr} %.
-  The total loan duration is #{duration} months.
+  The total loan duration is #{duration.to_i * 12} months.
   The total monthly interest is #{monthly_interest} points.
   ----------------------------------------------
   MSG
@@ -31,18 +86,18 @@ end
 def monthly(loan_amount, monthly_interest, duration)
   if monthly_interest > 0
     loan_amount *
-      (monthly_interest / (1 - (1 + monthly_interest)**(-1 * duration)))
+      (monthly_interest / (1 - (1 + monthly_interest)**(-1 * (duration * 12))))
   else
     loan_amount / duration
   end
 end
-
+#------------------------------------------------------------------------------------------------------------#
 prompt(MESSAGES['begin'])
 
 user_name = nil
 loop do
   user_name = gets.chomp
-  if user_name.empty?
+  if user_name.empty? || user_name == " "
     prompt(MESSAGES['invalid_name'])
   else
     break
@@ -71,43 +126,12 @@ loop do
     end
   end
 
-  loan_amount = nil
-  loop do
-    prompt(MESSAGES['loan_amount'])
-    loan_amount = gets.chomp.to_i
-    if loan_amount > 0
-      prompt("You've entered $#{loan_amount}.")
-      break
-    else
-      prompt(MESSAGES['amount_invalid'])
-    end
-  end
+  loan_amount = retrieve_input('loan')
 
-  apr = nil
-  loop do
-    prompt(MESSAGES['apr_amount'])
-    apr = gets.chomp.to_f
-    if apr >= 0 && apr <= 100
-      prompt("You've entered #{apr} %.")
-      break
-    else
-      prompt(MESSAGES['apr_invalid'])
-    end
-  end
-
-  duration = nil
-  loop do
-    prompt(MESSAGES['duration'])
-    duration = gets.chomp
-    if duration.to_i > 0 && !(duration.include? '.')
-      duration = duration.to_i * 12
-      prompt("Your total loan duration is #{duration} months.")
-      break
-    else
-      prompt(MESSAGES['duration_invalid'])
-    end
-  end
-
+  apr = retrieve_input('apr')
+  
+  duration = retrieve_input('duration')
+  
   monthly_interest = ((apr / 100) / 12).round(5)
 
   halfway(type, loan_amount, apr, duration, monthly_interest)
