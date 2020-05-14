@@ -37,7 +37,21 @@ Approach:
 C:
 =end
 
+# def cleanup(string)
+#   string.gsub(/\W+/, ' ')
+# end
+# p cleanup("---what's my +*& line?")
+
 def cleanup(string)
-  string.gsub(/\W+/, ' ')
-end
-p cleanup("---what's my +*& line?")
+  counter = 0
+
+  newstr = string.split('').each do |character|
+            if character.match?(/[a-zA-Z]+/)
+              next
+            else
+              character.replace(' ') if string[-1] == ' '
+            end
+          end
+            p newstr
+  end
+  cleanup("---what's my +*& line?")
