@@ -42,6 +42,22 @@ def welcome
   prompt "Please enter a response:"
 end
 
+def input_validity(user_input)
+  if VALID_ANSWER.include?(user_input)
+    true
+  else
+    prompt "Invalid choice. Try 'y, yes, n, or no'"
+  end
+end
+
+def yes_or_no(choice)
+  if choice == 'y' || choice == 'yes'
+    true
+  else
+    false
+  end
+end
+
 def display_score(array)
   prompt "The score is:"
   prompt "Player: #{array[0]}"
@@ -92,14 +108,6 @@ def computer_offense(setup)
     end
   end
   square
-end
-
-def choose_who_goes_first(choice)
-  if choice == 'y' || choice == 'yes'
-    true
-  else
-    false
-  end
 end
 
 def who_goes_first(choice, brd, scre)
@@ -192,22 +200,19 @@ end
 loop do
   score = [0, 0, 0]
   response = ''
+  answer = ''
   system 'clear'
   welcome
 
   loop do
     response = gets.chomp.downcase
-    if VALID_ANSWER.include?(response)
-      break
-    else
-      prompt "Invalid choice. Try 'y, yes, n, or no'"
-    end
+    break if input_validity(response)
   end
 
   loop do
     board = initialize_board
 
-    who_goes_first(choose_who_goes_first(response), board, score)
+    who_goes_first(yes_or_no(response), board, score)
 
     if someone_won?(board)
       prompt "#{detect_winner(board)} won!"
@@ -225,8 +230,17 @@ loop do
 
   prompt "Player: #{score[0]} - Computer: #{score[1]} - Ties: #{score[2]}"
   prompt "Play again? (y or n)"
-  answer = gets.chomp.downcase
-  break unless answer == 'y'
+
+  loop do
+    answer = gets.chomp.downcase
+    break if input_validity(answer)
+  end
+
+  if input_validity(answer) && yes_or_no(answer)
+    next
+  elsif input_validity(answer) && !yes_or_no(answer)
+    break
+  end
 end
 
 prompt "Thanks for playing Tic Tac Toe! Good bye"
