@@ -1,3 +1,5 @@
+require 'pry'
+
 SUITS = %w(h s d c)
 CARDS = %w(2 3 4 5 6 7 8 9 10 J Q K A)
 VALID_ANSWER = %w(h s hit stay)
@@ -174,48 +176,84 @@ end
 
 def determine_winner(p_hand, d_hand)
   if hand_value(p_hand) == 21
-    prompt "Player wins!"
+    "Player"
   elsif hand_value(p_hand) <= 21 &&
         (hand_value(p_hand) > hand_value(d_hand))
-    prompt 'Player wins!'
+    "Player"
   elsif busted?(d_hand)
-    prompt "Dealer bust!"
-    prompt "Player wins!"
+    "Bust"
   elsif hand_value(p_hand) == hand_value(d_hand)
+    "Tie"
+  else
+    "Dealer"
+  end
+end
+
+def continue
+  prompt "Press any key to continue!"
+  gets.chomp
+end
+
+def prompt_winner(string)
+  if string == "Player"
+    prompt "Player wins!"
+  elsif string == "Tie"
     prompt "It's a push!"
+  elsif string == "Bust"
+    prompt "Player wins!"
+    prompt "Dealer bust!"
   else
     prompt "Dealer wins!"
   end
 end
-
 #----------------------------------#
 
 loop do
-  player_hand = []
-  dealer_hand = []
+  score = [0, 0]
   answer = ''
 
-  system 'clear'
-  deck = intiialize_deck(CARDS, SUITS)
-  initial_card_deal(deck, player_hand, dealer_hand)
-  initial_prompt(player_hand, dealer_hand)
-
   loop do
-    response = hit_or_stay
-    if response.start_with?('h')
-      player_turn(player_hand, PLAYER, deck)
+    player_hand = []
+    dealer_hand = []
+
+    system 'clear'
+    deck = intiialize_deck(CARDS, SUITS)
+    initial_card_deal(deck, player_hand, dealer_hand)
+    initial_prompt(player_hand, dealer_hand)
+
+    loop do
+      response = hit_or_stay
+      if response.start_with?('h')
+        player_turn(player_hand, PLAYER, deck)
+      end
+      break if !response.start_with?('h') || busted?(player_hand)
     end
-    break if !response.start_with?('h') || busted?(player_hand)
+
+    if busted?(player_hand)
+      prompt "#{PLAYER} has busted!"
+    else
+      computer_turn(dealer_hand, DEALER, deck)
+      hand_showing_and_value(player_hand, PLAYER)
+      hand_showing_and_value(dealer_hand, DEALER)
+    end
+    winner = determine_winner(player_hand, dealer_hand)
+    prompt_winner(winner)
+
+    if winner == 'Player' || winner == 'Bust'
+      score[0] += 1
+    elsif winner == 'Dealer'
+      score[1] += 1
+    end
+    prompt "Score is: Player: #{score[0]} - Dealer: #{score[1]}"
+    continue
+    break if score[0] == 5 || score[1] == 5
   end
 
-  if busted?(player_hand)
-    prompt "#{PLAYER} has busted!"
-  else
-    computer_turn(dealer_hand, DEALER, deck)
-    hand_showing_and_value(player_hand, PLAYER)
-    hand_showing_and_value(dealer_hand, DEALER)
+  if score[0] == 5
+    prompt "Player won!"
+  elsif score[1] == 5
+    prompt "Dealer won!"
   end
-  determine_winner(player_hand, dealer_hand)
 
   prompt "Would you like to play again?"
 
