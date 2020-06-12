@@ -1,5 +1,3 @@
-require 'pry'
-
 SUITS = %w(h s d c)
 CARDS = %w(2 3 4 5 6 7 8 9 10 J Q K A)
 VALID_ANSWER = %w(h s hit stay)
@@ -206,6 +204,7 @@ def prompt_winner(string)
     prompt "Dealer wins!"
   end
 end
+
 #----------------------------------#
 
 loop do
